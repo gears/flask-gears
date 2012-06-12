@@ -10,7 +10,7 @@ from setuptools import setup
 setup(
     name='Flask-Gears',
     version='0.1.dev',
-    url='https://github.com/trilan/flask-gears',
+    url='https://github.com/gears/flask-gears',
     license='ISC',
     author='Mike Yumatov',
     author_email='mike@yumatov.org',
