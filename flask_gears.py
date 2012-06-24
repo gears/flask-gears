@@ -1,7 +1,7 @@
 import mimetypes
 import os
 from StringIO import StringIO
-from flask import send_file
+from flask import send_file, current_app
 
 from gears.assets import build_asset
 from gears.environment import Environment
@@ -16,38 +16,42 @@ class Gears(object):
         self.assets_folder = assets_folder
         if app is not None:
             self.init_app(app)
-        else:
-            self.app = None
 
     def init_app(self, app):
-        self.app = app
-        self.init_environment()
-        self.replace_static_view()
+        app.extensions['gears'] = {}
+        self.init_environment(app)
+        self.replace_static_view(app)
 
-    def init_environment(self):
-        self.environment = Environment(self.get_static_folder())
+    def init_environment(self, app):
+        environment = Environment(self.get_static_folder(app))
         if self.defaults:
-            self.environment.register_defaults()
-            self.environment.finders.register(self.get_default_finder())
+            environment.register_defaults()
+            environment.finders.register(self.get_default_finder(app))
+        app.extensions['gears']['environment'] = environment
 
-    def replace_static_view(self):
-        self.original_static_view = self.app.view_functions['static']
-        self.app.add_url_rule(self.app.static_url_path + '/<path:filename>',
-                              endpoint='static', view_func=self.send_asset)
+    def replace_static_view(self, app):
+        app.extensions['gears']['static_view'] = app.view_functions['static']
+        app.add_url_rule(app.static_url_path + '/<path:filename>',
+                         endpoint='static', view_func=self.asset_view)
 
-    def send_asset(self, filename):
+    def asset_view(self, filename):
+        environment = current_app.extensions['gears']['environment']
+        static_view = current_app.extensions['gears']['static_view']
         try:
-            asset = build_asset(self.environment, filename)
+            asset = build_asset(environment, filename)
         except FileNotFound:
-            return self.original_static_view(filename)
+            return static_view(filename)
         mimetype, encoding = mimetypes.guess_type(filename)
         return send_file(StringIO(asset), mimetype=mimetype, conditional=True)
 
-    def get_default_finder(self):
-        return FileSystemFinder(directories=(self.get_assets_folder(),))
+    def get_environment(self, app):
+        return app.extensions['gears']['environment']
 
-    def get_static_folder(self):
-        return self.app.static_folder
+    def get_default_finder(self, app):
+        return FileSystemFinder(directories=(self.get_assets_folder(app),))
 
-    def get_assets_folder(self):
-        return os.path.join(self.app.root_path, self.assets_folder)
+    def get_static_folder(self, app):
+        return app.static_folder
+
+    def get_assets_folder(self, app):
+        return os.path.join(app.root_path, self.assets_folder)
