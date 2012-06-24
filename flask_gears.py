@@ -20,7 +20,7 @@ class Gears(object):
     def init_app(self, app):
         app.extensions['gears'] = {}
         self.init_environment(app)
-        self.replace_static_view(app)
+        self.init_asset_view(app)
 
     def init_environment(self, app):
         environment = Environment(self.get_static_folder(app))
@@ -29,7 +29,7 @@ class Gears(object):
             environment.finders.register(self.get_default_finder(app))
         app.extensions['gears']['environment'] = environment
 
-    def replace_static_view(self, app):
+    def init_asset_view(self, app):
         app.extensions['gears']['static_view'] = app.view_functions['static']
         app.add_url_rule(app.static_url_path + '/<path:filename>',
                          endpoint='static', view_func=self.asset_view)
