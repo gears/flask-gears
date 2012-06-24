@@ -1,2 +1,3 @@
-*.egg-info/
+*.egg-info
 *.pyc
+node_modules
