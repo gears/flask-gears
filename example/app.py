@@ -1,17 +1,15 @@
-import os
 from flask import Flask, render_template
 from flask_gears import Gears
-
-
-NODE_PATH = os.path.join(os.path.dirname(__file__), 'node_modules')
-NODE_PATH = os.path.normpath(os.path.abspath(NODE_PATH))
-os.environ['NODE_PATH'] = NODE_PATH
+from gears_stylus import StylusCompiler
 
 
 app = Flask(__name__)
 
 gears = Gears()
 gears.init_app(app)
+
+env = gears.get_environment(app)
+env.compilers.register('.styl', StylusCompiler.as_handler())
 
 
 @app.route('/')
