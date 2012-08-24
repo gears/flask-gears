@@ -5,11 +5,10 @@ from gears_stylus import StylusCompiler
 
 app = Flask(__name__)
 
-gears = Gears()
+gears = Gears(compilers={
+    '.styl': StylusCompiler.as_handler(),
+})
 gears.init_app(app)
-
-env = gears.get_environment(app)
-env.compilers.register('.styl', StylusCompiler.as_handler())
 
 
 @app.route('/')

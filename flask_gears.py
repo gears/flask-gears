@@ -11,9 +11,10 @@ from gears.finders import FileSystemFinder
 
 class Gears(object):
 
-    def __init__(self, app=None, defaults=True, assets_folder='assets'):
+    def __init__(self, app=None, defaults=True, assets_folder='assets', compilers=None):
         self.defaults = defaults
         self.assets_folder = assets_folder
+        self.compilers = compilers
         if app is not None:
             self.init_app(app)
 
@@ -27,6 +28,9 @@ class Gears(object):
         if self.defaults:
             environment.register_defaults()
             environment.finders.register(self.get_default_finder(app))
+        if self.compilers is not None:
+            for extension, compiler in self.compilers.items():
+                environment.compilers.register(extension, compiler)
         app.extensions['gears']['environment'] = environment
 
     def init_asset_view(self, app):
