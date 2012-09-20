@@ -60,7 +60,7 @@ class Gears(object):
         return FileSystemFinder(directories=(self.get_assets_folder(app),))
 
     def get_static_folder(self, app):
-        return app.static_folder
+        return app.config.get('GEARS_ROOT', app.static_folder)
 
     def get_assets_folder(self, app):
         return os.path.join(app.root_path, self.assets_folder)
