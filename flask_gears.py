@@ -4,7 +4,7 @@ from StringIO import StringIO
 from flask import send_file, current_app
 
 from gears.assets import build_asset
-from gears.environment import Environment
+from gears.environment import Environment, DEFAULT_PUBLIC_ASSETS
 from gears.exceptions import FileNotFound
 from gears.finders import FileSystemFinder
 
@@ -12,11 +12,12 @@ from gears.finders import FileSystemFinder
 class Gears(object):
 
     def __init__(self, app=None, defaults=True, assets_folder='assets',
-                 compilers=None, compressors=None):
+                 compilers=None, compressors=None, public_assets=None):
         self.defaults = defaults
         self.assets_folder = assets_folder
         self.compilers = compilers
         self.compressors = compressors
+        self.public_assets = public_assets
         if app is not None:
             self.init_app(app)
 
@@ -26,7 +27,10 @@ class Gears(object):
         self.init_asset_view(app)
 
     def init_environment(self, app):
-        environment = Environment(self.get_static_folder(app))
+        environment = Environment(
+            root=self.get_static_folder(app),
+            public_assets=self.get_public_assets(app),
+        )
         if self.defaults:
             environment.register_defaults()
             environment.finders.register(self.get_default_finder(app))
@@ -64,3 +68,8 @@ class Gears(object):
 
     def get_assets_folder(self, app):
         return os.path.join(app.root_path, self.assets_folder)
+
+    def get_public_assets(self, app):
+        if self.public_assets is None:
+            return DEFAULT_PUBLIC_ASSETS
+        return self.public_assets
