@@ -5,14 +5,14 @@ Flask-Gears
 Gears_ for Flask_.
 
 .. _Gears: https://github.com/gears/gears
-.. _Django: http://flask.pocoo.org/
+.. _Flask: http://flask.pocoo.org/
 """
 from setuptools import setup
 
 
 setup(
     name='Flask-Gears',
-    version='0.1',
+    version='0.1.1',
     url='https://github.com/gears/flask-gears',
     license='ISC',
     author='Mike Yumatov',
