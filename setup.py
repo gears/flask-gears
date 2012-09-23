@@ -2,14 +2,17 @@
 Flask-Gears
 -----------
 
-Gears for Flask.
+Gears_ for Flask_.
+
+.. _Gears: https://github.com/gears/gears
+.. _Django: http://flask.pocoo.org/
 """
 from setuptools import setup
 
 
 setup(
     name='Flask-Gears',
-    version='0.1.dev',
+    version='0.1',
     url='https://github.com/gears/flask-gears',
     license='ISC',
     author='Mike Yumatov',
@@ -29,7 +32,6 @@ setup(
         'License :: OSI Approved :: ISC License (ISCL)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Internet :: WWW/HTTP',
