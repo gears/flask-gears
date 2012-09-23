@@ -12,12 +12,14 @@ from gears.finders import FileSystemFinder
 class Gears(object):
 
     def __init__(self, app=None, defaults=True, assets_folder='assets',
-                 compilers=None, compressors=None, public_assets=None):
+                 compilers=None, compressors=None, public_assets=None,
+                 cache=None):
         self.defaults = defaults
         self.assets_folder = assets_folder
         self.compilers = compilers
         self.compressors = compressors
         self.public_assets = public_assets
+        self.cache = None
         if app is not None:
             self.init_app(app)
 
@@ -30,6 +32,7 @@ class Gears(object):
         environment = Environment(
             root=self.get_static_folder(app),
             public_assets=self.get_public_assets(app),
+            cache=self.get_cache(app),
         )
         if self.defaults:
             environment.register_defaults()
@@ -73,3 +76,6 @@ class Gears(object):
         if self.public_assets is None:
             return DEFAULT_PUBLIC_ASSETS
         return self.public_assets
+
+    def get_cache(self, app):
+        return self.cache
