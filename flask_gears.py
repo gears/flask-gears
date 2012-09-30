@@ -13,12 +13,13 @@ class Gears(object):
 
     def __init__(self, app=None, defaults=True, assets_folder='assets',
                  compilers=None, compressors=None, public_assets=None,
-                 cache=None):
+                 extra_public_assets=None, cache=None):
         self.defaults = defaults
         self.assets_folder = assets_folder
         self.compilers = compilers
         self.compressors = compressors
         self.public_assets = public_assets
+        self.extra_public_assets = extra_public_assets
         self.cache = None
         if app is not None:
             self.init_app(app)
@@ -73,9 +74,13 @@ class Gears(object):
         return os.path.join(app.root_path, self.assets_folder)
 
     def get_public_assets(self, app):
-        if self.public_assets is None:
-            return DEFAULT_PUBLIC_ASSETS
-        return self.public_assets
+        if self.public_assets is not None:
+            public_assets = tuple(self.public_assets)
+        else:
+            public_assets = DEFAULT_PUBLIC_ASSETS
+        if self.extra_public_assets is not None:
+            public_assets += tuple(self.extra_public_assets)
+        return public_assets
 
     def get_cache(self, app):
         return self.cache
