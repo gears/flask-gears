@@ -1,7 +1,9 @@
 import mimetypes
 import os
 from StringIO import StringIO
-from flask import send_file, current_app
+from functools import partial
+from flask import send_file, current_app, url_for, request
+from jinja2 import Markup
 
 from gears.assets import build_asset
 from gears.environment import Environment, DEFAULT_PUBLIC_ASSETS
@@ -10,6 +12,9 @@ from gears.finders import FileSystemFinder
 
 
 class Gears(object):
+
+    css_template = '<link rel="stylesheet" href="{url}">'
+    js_template = '<script src="{url}"></script>'
 
     def __init__(self, app=None, defaults=True, assets_folder='assets',
                  compilers=None, compressors=None, public_assets=None,
@@ -28,6 +33,13 @@ class Gears(object):
         app.extensions['gears'] = {}
         self.init_environment(app)
         self.init_asset_view(app)
+
+        @app.context_processor
+        def gears_processor():
+            return dict(
+                css_tag=partial(self.html_tag, self.css_template),
+                js_tag=partial(self.html_tag, self.js_template),
+            )
 
     def init_environment(self, app):
         environment = Environment(
@@ -58,8 +70,23 @@ class Gears(object):
             asset = build_asset(environment, filename)
         except FileNotFound:
             return static_view(filename)
+        if request.args.get('body'):
+            asset = asset.processed_source.encode('utf-8')
         mimetype, encoding = mimetypes.guess_type(filename)
         return send_file(StringIO(asset), mimetype=mimetype, conditional=True)
+
+    def html_tag(self, template, logical_path, debug=False):
+        if debug or self.debug(current_app):
+            environment = self.get_environment(current_app)
+            asset = build_asset(environment, logical_path)
+            urls = []
+            for requirement in asset.requirements:
+                logical_path = requirement.attributes.logical_path
+                url = url_for('static', filename=logical_path, body=1)
+                urls.append(url)
+        else:
+            urls = (url_for('static', filename=logical_path),)
+        return Markup('\n'.join(template.format(url=url) for url in urls))
 
     def get_environment(self, app):
         return app.extensions['gears']['environment']
@@ -84,3 +111,6 @@ class Gears(object):
 
     def get_cache(self, app):
         return self.cache
+
+    def debug(self, app):
+        return app.config.get('GEARS_DEBUG', app.debug)
