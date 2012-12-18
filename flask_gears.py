@@ -40,8 +40,7 @@ class Gears(object):
 
     def init_asset_view(self, app):
         app.extensions['gears']['static_view'] = app.view_functions['static']
-        app.add_url_rule(app.static_url_path + '/<path:filename>',
-                         endpoint='static', view_func=self.asset_view)
+        app.view_functions['static'] = self.asset_view
 
     def asset_view(self, filename):
         environment = current_app.extensions['gears']['environment']
