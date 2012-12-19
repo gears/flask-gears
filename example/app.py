@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from flask_gears import Gears
+from flask.ext.gears import Gears
 
 from gears_stylus import StylusCompiler
 from gears_clean_css import CleanCSSCompressor
