@@ -6,6 +6,7 @@ from flask import send_file, current_app, url_for, request
 from jinja2 import Markup
 
 from gears.assets import build_asset
+from gears.compat import bytes
 from gears.environment import Environment, DEFAULT_PUBLIC_ASSETS
 from gears.exceptions import FileNotFound
 from gears.finders import FileSystemFinder
@@ -72,7 +73,8 @@ class Gears(object):
         if request.args.get('body'):
             asset = asset.processed_source.encode('utf-8')
         mimetype, encoding = mimetypes.guess_type(filename)
-        return send_file(StringIO(asset), mimetype=mimetype, conditional=True)
+        source = bytes(asset)
+        return send_file(StringIO(source), mimetype=mimetype, conditional=True)
 
     def html_tag(self, template, logical_path, debug=False):
         if debug or self.debug(current_app):
