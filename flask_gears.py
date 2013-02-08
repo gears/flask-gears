@@ -77,8 +77,8 @@ class Gears(object):
         return send_file(StringIO(source), mimetype=mimetype, conditional=True)
 
     def html_tag(self, template, logical_path, debug=False):
+        environment = self.get_environment(current_app)
         if debug or self.debug(current_app):
-            environment = self.get_environment(current_app)
             asset = build_asset(environment, logical_path)
             urls = []
             for requirement in asset.requirements:
@@ -86,6 +86,8 @@ class Gears(object):
                 url = url_for('static', filename=logical_path, body=1)
                 urls.append(url)
         else:
+            if logical_path in environment.manifest.files:
+                logical_path = environment.manifest.files[logical_path]
             urls = (url_for('static', filename=logical_path),)
         return Markup('\n'.join(template.format(url=url) for url in urls))
 
