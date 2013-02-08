@@ -19,7 +19,7 @@ class Gears(object):
 
     def __init__(self, app=None, defaults=True, assets_folder='assets',
                  compilers=None, compressors=None, public_assets=None,
-                 extra_public_assets=None, cache=None):
+                 extra_public_assets=None, cache=None, gzip=False):
         self.defaults = defaults
         self.assets_folder = assets_folder
         self.compilers = compilers
@@ -27,6 +27,7 @@ class Gears(object):
         self.public_assets = public_assets
         self.extra_public_assets = extra_public_assets
         self.cache = None
+        self.gzip = gzip
         if app is not None:
             self.init_app(app)
 
@@ -47,6 +48,7 @@ class Gears(object):
             root=self.get_static_folder(app),
             public_assets=self.get_public_assets(app),
             cache=self.get_cache(app),
+            gzip=self.gzip,
         )
         if self.defaults:
             environment.register_defaults()
