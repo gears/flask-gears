@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Gears',
-    version='0.1.2',
+    version='0.2',
     url='https://github.com/gears/flask-gears',
     license='ISC',
     author='Mike Yumatov',
